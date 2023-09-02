@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>TODO manager</title>
+    <style>
+        body {padding: 20px; padding-left: 60px;}
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>
+            TODO: 
+            <span class="badge" :class="todoCounterColor">
+                {{todoCounter_comp}}
+            </span>
+        </h1>
+
+        <hr>
+        <div v-for="todo in todos">
+            <div class="alert alert-dismissible fade show" role="alert" v-bind:class="todo.type">{{todo.text}}
+                <div>
+                    <template v-for="tag in todo.tags">
+                        <span class="badge badge-secondary mr-2">{{tagToUpper(tag)}}</span></h1>
+                    </template>
+                </div>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" @click="deleteTodo(todo.id)">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        const {createApp} = Vue
+
+        createApp({
+            data() {
+                return {
+                    todos: []
+                }
+            },
+            computed: {
+                todoCounter_comp() {
+                    return this.todos.length
+                },
+                todoCounterColor() {
+                    if(this.todos.length > 4) {
+                        return 'badge-danger'
+                    } else if(this.todos.length > 3) {
+                        return 'badge-warning'
+                    } else {
+                        return 'badge-success'
+                    }
+                }
+            },
+            methods: {
+                async fetchData() {
+                    const url = 'https://gist.githubusercontent.com/siposm/86860e30a000a5dca4b0855f7644bcf2/raw/39c5c3947ee5469532bd7d6ddea6b54e58acd3c0/todos.json'
+                    this.todos = (await (await fetch(url)).json()).todos
+                },
+                tagToUpper(tag) {
+                    return tag.toUpperCase()
+                },
+                deleteTodo(todoId) {
+                    let index = this.todos.findIndex(x => x.id == todoId)
+                    this.todos.splice(index, 1)
+                }
+                // todoCounter() {
+                //     return this.todos.length
+                // }
+            },
+            created() {
+                this.fetchData()
+            }
+        }).mount('#app')
+
+    </script>
+</body>
+</html>
